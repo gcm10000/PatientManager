@@ -6,11 +6,11 @@ namespace PatientManager.WinFormsApp.Services
 {
     public class CameraService : IDisposable
     {
-        private readonly VideoCapture _capture;
         private readonly Mat _frame;
         private Image? _image;
         private bool _continue;
         private PictureBox? _pictureBox;
+        private VideoCapture _capture;
 
         public Action<Exception> GetError { get; set; } = null!;
 
@@ -22,9 +22,14 @@ namespace PatientManager.WinFormsApp.Services
 
         public void StartImagePreview(CameraInformation cameraInformation, PictureBox pictureBox)
         {
-            _capture.Open(cameraInformation.Index);
+            if (_capture.IsDisposed)
+            {
+                _capture = new VideoCapture(0);
+            }
+
             if (!_capture.IsOpened())
                 return;
+            _capture.Open(cameraInformation.Index);
             _continue = true;
             _pictureBox = pictureBox;
             System.Windows.Forms.Application.Idle += RunEvent(pictureBox, _frame);
@@ -58,7 +63,7 @@ namespace PatientManager.WinFormsApp.Services
                 catch (ArgumentException)
                 {
                     if (GetError is not null)
-                        GetError(new InvalidOperationException(message: "Câmera já se encontra utilizada."));
+                        GetError(new InvalidOperationException(message: "A câmera está reservada por outro aplicativo."));
                     Dispose();
                     return;
                 }

@@ -145,7 +145,7 @@ namespace PatientManager.Domain.Services
         {
             var person = patient.Person;
 
-            if (string.IsNullOrWhiteSpace(person.Name))
+            if (string.IsNullOrWhiteSpace(person.Name) || !(person.Name.All(c => char.IsLetter(c) || char.IsWhiteSpace(c))))
                 yield return "Nome inválido.";
 
             if (!person.IsCPFValid())
@@ -159,7 +159,7 @@ namespace PatientManager.Domain.Services
                     yield return "CPF já existente.";
             }
 
-            if (string.IsNullOrWhiteSpace(person.RG))
+            if (string.IsNullOrWhiteSpace(person.RG) || !person.RG.All(char.IsDigit))
                 yield return "RG inválido.";
 
             if (patient.MedicalRecordNumber <= 0)
