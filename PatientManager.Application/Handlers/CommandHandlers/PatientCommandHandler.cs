@@ -19,9 +19,7 @@ namespace PatientManager.Application.Handlers.CommandHandlers
         IRequestHandler<UpdateAttendPatientCommand, Response>,
         IRequestHandler<DeleteAttendPatientCommand, Response>,
         IRequestHandler<ExportAttendancesToCSVCommand, byte[]?>,
-        IRequestHandler<ExportAttendanceToXLSXCommand, byte[]?>,
-        IRequestHandler<ExportPatientsToCSVCommand, byte[]?>,
-        IRequestHandler<ExportPatientsToXLSXQuery, byte[]?>
+        IRequestHandler<ExportAttendanceToXLSXCommand, byte[]?>
 
     {
         private readonly IPatientService _patientService;
@@ -50,7 +48,7 @@ namespace PatientManager.Application.Handlers.CommandHandlers
             using (_unitOfWork)
             {
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
-                var photo = GetPhoto(command, guid);
+                var photo = command.GetPhoto(guid);
                 var patient = new Domain.Common.Entities.Patient()
                 {
                     Person = new Person(command.Name, photo, command.CPF, command.RG),
@@ -64,13 +62,6 @@ namespace PatientManager.Application.Handlers.CommandHandlers
                 await _unitOfWork.CommitAsync(cancellationToken);
                 return new Response(notifications);
             }
-        }
-
-        private static string? GetPhoto(CreatePatientCommand command, Guid guid)
-        {
-            if (command.Photo is not null)
-                return guid.ToString() + command.Photo.Extension;
-            return null;
         }
 
         public async Task<Response> Handle(UpdatePatientCommand command, CancellationToken cancellationToken)
@@ -172,20 +163,6 @@ namespace PatientManager.Application.Handlers.CommandHandlers
         public async Task<byte[]?> Handle(ExportAttendanceToXLSXCommand request, CancellationToken cancellationToken)
         {
             var patients = await _patientService.GetAttendancesAsync(request.PatientId);
-            var file = await _exportFileXLSX.WriteDataAsync(patients.ToList());
-            return file;
-        }
-
-        public async Task<byte[]?> Handle(ExportPatientsToCSVCommand request, CancellationToken cancellationToken)
-        {
-            var patients = await _patientService.GetPatientsAsync();
-            var file = await _exportFileCSV.WriteDataAsync(patients.ToList());
-            return file;
-        }
-
-        public async Task<byte[]?> Handle(ExportPatientsToXLSXQuery request, CancellationToken cancellationToken)
-        {
-            var patients = await _patientService.GetPatientsAsync();
             var file = await _exportFileXLSX.WriteDataAsync(patients.ToList());
             return file;
         }

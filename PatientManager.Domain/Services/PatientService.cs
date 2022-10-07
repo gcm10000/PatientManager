@@ -164,9 +164,6 @@ namespace PatientManager.Domain.Services
 
             if (patient.MedicalRecordNumber <= 0)
                 yield return "Número do prontuário deve ser válido.";
-
-            if (string.IsNullOrWhiteSpace(patient.HealthInsurance))
-                yield return "Convênio deve ser preenchido.";
         }
 
         private static IEnumerable<string> ValidateAttend(DateTime date)

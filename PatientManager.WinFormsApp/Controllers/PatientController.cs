@@ -4,7 +4,6 @@ using PatientManager.Application.Commands.Patient.Exports;
 using PatientManager.Application.Queries.Patient;
 using PatientManager.Domain.Common.DTOs;
 using PatientManager.Domain.Common.Entities;
-using PatientManager.Domain.Common.Interfaces.Services;
 
 namespace PatientManager.WinFormsApp.Controllers
 {
@@ -12,7 +11,7 @@ namespace PatientManager.WinFormsApp.Controllers
     {
         private readonly IMediator _mediator;
 
-        public PatientController(IMediator mediator, IPatientService patientService)
+        public PatientController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -158,7 +157,7 @@ namespace PatientManager.WinFormsApp.Controllers
             return null;
         }
 
-        public async Task<byte[]?> ExportPatientToCSVAsync(ExportPatientsToCSVCommand query)
+        public async Task<byte[]?> ExportPatientToCSVAsync(ExportPatientsToCSVQuery query)
         {
             try
             {

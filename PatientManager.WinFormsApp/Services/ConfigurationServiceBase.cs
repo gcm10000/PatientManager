@@ -32,9 +32,18 @@ namespace PatientManager.WinFormsApp.Services
 
         protected virtual async Task SetVariableAsync(Guid guid, object value)
         {
-            var data = Encoding.UTF8.GetBytes(value.ToString());
+            var data = GetBytes(value);
             Environment.SetEnvironmentVariable(guid.ToString(), value.ToString());
             await WriterFileService.PublishFileAsync(new FileTransfer(data, guid, ".json"));
+        }
+
+        private static byte[] GetBytes(object value)
+        {
+            var str = value.ToString();
+            if (str is null)
+                return Array.Empty<byte>();
+
+            return Encoding.UTF8.GetBytes(str);
         }
     }
 }

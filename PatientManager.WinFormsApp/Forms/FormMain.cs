@@ -16,6 +16,7 @@ namespace PatientManager.WinFormsApp.Forms
         private readonly IPageSizeService _pageSize;
         private readonly PatientController _patientController;
         private FilterInput _filterInput;
+        private string _actualText;
 
         public FormMain(IServiceProvider serviceProvider,
                         IPatientService patientService,
@@ -40,6 +41,7 @@ namespace PatientManager.WinFormsApp.Forms
         private async void ButtonSearch_Click(object sender, EventArgs e)
         {
             await SearchPatient();
+            await SearchAndManipuleUI();
         }
 
         private async void TextBoxSearch_KeyDown(object sender, KeyEventArgs e)
@@ -69,7 +71,7 @@ namespace PatientManager.WinFormsApp.Forms
         private async Task SearchPatient()
         {
             var text = _textBoxSearch.Text;
-            if (string.IsNullOrWhiteSpace(text))
+            if (_actualText.Equals(text))
                 return;
 
             _filterInput = _filterInput with { CurrentPage = 1, Query = text, ItemsPerPage = _pageSize.PageSize };
@@ -79,6 +81,7 @@ namespace PatientManager.WinFormsApp.Forms
         private async Task SearchAndManipuleUI()
         {
             var responseList = await _patientService.SearchAsync(_filterInput);
+            _actualText = _textBoxSearch.Text;
             var persons = responseList.Items.Select(x => new PatientViewModel
             (
                 x.Id,
@@ -86,7 +89,7 @@ namespace PatientManager.WinFormsApp.Forms
                 x.Person.CPF,
                 x.Person.RG
             ));
-
+            
             var list = new BindingList<PatientViewModel>(persons.ToList());
             _dataGridViewResults.Columns.Clear();
             _dataGridViewResults.DataSource = list;

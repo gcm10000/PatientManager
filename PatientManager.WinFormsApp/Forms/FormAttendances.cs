@@ -12,7 +12,6 @@ namespace PatientManager.WinFormsApp.Forms
         private readonly PatientController _patientController;
         private readonly IServiceProvider _serviceProvider;
         private readonly IPageSizeService _pageSize;
-        private readonly Guid guid;
         private FilterInput _filterInput;
         private int _patientId;
         public FormAttendances(PatientController patientController,
