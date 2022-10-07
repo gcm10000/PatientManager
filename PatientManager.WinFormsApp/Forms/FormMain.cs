@@ -33,9 +33,11 @@ namespace PatientManager.WinFormsApp.Forms
 
         #region EventsMethods
 
-        private void AdicionarPacienteToolStripMenuItem_Click(object sender, EventArgs e)
+        private async void AdicionarPacienteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            _serviceProvider.TryShowDialogFromAnotherForm<FormAddOrUpdatePatient>();
+            var dialog = _serviceProvider.TryShowDialogFromAnotherForm<FormAddOrUpdatePatient>();
+            if (dialog == DialogResult.OK)
+                await SearchAndManipuleUI();
         }
 
         private async void ButtonSearch_Click(object sender, EventArgs e)
@@ -123,7 +125,8 @@ namespace PatientManager.WinFormsApp.Forms
 
         private void DataGridViewResults_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            _dataGridViewResults.Rows[e.RowIndex].Selected = true;
+           if (e.RowIndex > -1)
+             _dataGridViewResults.Rows[e.RowIndex].Selected = true;
         }
 
         private void ConfigurarNúmeroDeRegistroPorPáginaToolStripMenuItem_Click(object sender, EventArgs e)
