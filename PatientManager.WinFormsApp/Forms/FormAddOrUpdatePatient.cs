@@ -58,6 +58,25 @@ namespace PatientManager.WinFormsApp.Forms
 
         private async void ButtonSave_Click(object sender, EventArgs e)
         {
+            if (_patientId is not null && _mode.Equals(EMode.Webcam))
+            {
+                var dialogResult = MessageBox.Show("A imagem será a mesma que já se encontra na base. Se você deseja que a imagem da câmera seja do paciente, então volte e clique no botão Capturar" + Environment.NewLine + "Deseja continuar?",
+                                                   "Atenção",
+                                                   MessageBoxButtons.YesNo,
+                                                   MessageBoxIcon.Information);
+                if (dialogResult == DialogResult.No)
+                    return;
+            }
+
+            if (_patientId is not null && _mode.Equals(EMode.Webcam))
+            {
+                var dialogResult = MessageBox.Show("A imagem será a mesma que já se encontra na base. Se você deseja que a imagem da câmera seja do paciente, então volte e clique no botão Capturar" + Environment.NewLine + "Deseja continuar?",
+                                                   "Atenção",
+                                                   MessageBoxButtons.YesNo,
+                                                   MessageBoxIcon.Information);
+                if (dialogResult == DialogResult.No)
+                    return;
+            }
             var name = _textBoxName.Text;
             var cpf = _textBoxCPF.Text.Replace(".", "").Replace("-", "");
             var rg = _textBoxRG.Text.Replace(".", "").Replace("-", "");
