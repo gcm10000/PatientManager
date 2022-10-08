@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace PatientManager.Application.Commands.Patient.Exports
+namespace PatientManager.Application.Queries.Patient.Exports
 {
     public record ExportPatientsToXLSXQuery : IRequest<byte[]>;
 }

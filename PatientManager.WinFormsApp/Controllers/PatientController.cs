@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using PatientManager.Application.Commands.Patient;
-using PatientManager.Application.Commands.Patient.Exports;
 using PatientManager.Application.Queries.Patient;
+using PatientManager.Application.Queries.Patient.Exports;
 using PatientManager.Domain.Common.DTOs;
 using PatientManager.Domain.Common.Entities;
 
@@ -177,7 +177,7 @@ namespace PatientManager.WinFormsApp.Controllers
             return null;
         }
 
-        public async Task<byte[]?> ExportAttendancesToXLSXAsync(ExportAttendanceToXLSXCommand query)
+        public async Task<byte[]?> ExportAttendancesToXLSXAsync(ExportAttendancesToXLSXQuery query)
         {
             try
             {
@@ -197,7 +197,7 @@ namespace PatientManager.WinFormsApp.Controllers
             return null;
         }
 
-        public async Task<byte[]?> ExportAttendancesToCSVAsync(ExportAttendancesToCSVCommand query)
+        public async Task<byte[]?> ExportAttendancesToCSVAsync(ExportAttendancesToCSVQuery query)
         {
             try
             {

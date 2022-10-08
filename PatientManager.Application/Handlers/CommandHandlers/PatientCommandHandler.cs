@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using PatientManager.Application.Commands.Patient;
-using PatientManager.Application.Commands.Patient.Exports;
 using PatientManager.Application.DTOs;
 using PatientManager.Application.Interfaces;
 using PatientManager.Application.Interfaces.CSV;
@@ -17,9 +16,7 @@ namespace PatientManager.Application.Handlers.CommandHandlers
         IRequestHandler<UpdatePatientCommand, Response>,
         IRequestHandler<AttendPatientCommand, Response>,
         IRequestHandler<UpdateAttendPatientCommand, Response>,
-        IRequestHandler<DeleteAttendPatientCommand, Response>,
-        IRequestHandler<ExportAttendancesToCSVCommand, byte[]?>,
-        IRequestHandler<ExportAttendanceToXLSXCommand, byte[]?>
+        IRequestHandler<DeleteAttendPatientCommand, Response>
 
     {
         private readonly IPatientService _patientService;
@@ -151,20 +148,6 @@ namespace PatientManager.Application.Handlers.CommandHandlers
         private static bool IsToDeletePhoto(UpdatePatientCommand command)
         {
             return command.Photo is not null && command.Photo.Data.Equals(Array.Empty<byte>());
-        }
-
-        public async Task<byte[]?> Handle(ExportAttendancesToCSVCommand request, CancellationToken cancellationToken)
-        {
-            var patients = await _patientService.GetAttendancesAsync(request.PatientId);
-            var file = await _exportFileCSV.WriteDataAsync(patients.ToList());
-            return file;
-        }
-
-        public async Task<byte[]?> Handle(ExportAttendanceToXLSXCommand request, CancellationToken cancellationToken)
-        {
-            var patients = await _patientService.GetAttendancesAsync(request.PatientId);
-            var file = await _exportFileXLSX.WriteDataAsync(patients.ToList());
-            return file;
         }
     }
 }

@@ -3,7 +3,7 @@ using PatientManager.Application.Interfaces;
 using PatientManager.Application.Interfaces.CSV;
 using PatientManager.Application.Interfaces.XLSX;
 using PatientManager.Application.Queries.Patient;
-using PatientManager.Application.Queries.Patient.Imports;
+using PatientManager.Application.Queries.Patient.Exports;
 using PatientManager.Domain.Common.DTOs;
 using PatientManager.Domain.Common.Interfaces.Services;
 
@@ -13,9 +13,11 @@ namespace PatientManager.Application.Handlers.QueryHandlers
         IRequestHandler<GetPatientQuery, Domain.Common.Entities.Patient?>,
         IRequestHandler<GetPhotoQuery, byte[]?>,
         IRequestHandler<GetAttendancesQuery, PaginatedList<Domain.Common.Entities.Attendance>>,
-        IRequestHandler<ExportAttendanceToCSVQuery, byte[]>,
-        IRequestHandler<ExportPatientsToCSVQuery, byte[]?>,
-        IRequestHandler<ExportPatientsToXLSXQuery, byte[]?>
+        IRequestHandler<ExportAttendancesToCSVQuery, byte[]>,
+        IRequestHandler<ExportPatientsToCSVQuery, byte[]>,
+        IRequestHandler<ExportAttendancesToXLSXQuery, byte[]>,
+        IRequestHandler<ExportPatientsToXLSXQuery, byte[]>
+
     {
         private readonly IReaderFileService _readerFileService;
         private readonly IPatientService _patientService;
@@ -50,23 +52,30 @@ namespace PatientManager.Application.Handlers.QueryHandlers
             return _patientService.GetAttendancesAsync(request.Id, request.FilterInput);
         }
 
-        public async Task<byte[]> Handle(ExportAttendanceToCSVQuery request, CancellationToken cancellationToken)
+        public async Task<byte[]> Handle(ExportAttendancesToCSVQuery request, CancellationToken cancellationToken)
         {
-            var attendances = await _patientService.GetAttendancesAsync(request.patientId);
+            var attendances = await _patientService.GetAttendancesAsync(request.PatientId);
             return await _exportFileCSV.WriteDataAsync(attendances.ToList());
         }
 
-        public async Task<byte[]?> Handle(ExportPatientsToCSVQuery request, CancellationToken cancellationToken)
+        public async Task<byte[]> Handle(ExportPatientsToCSVQuery request, CancellationToken cancellationToken)
         {
             var patients = await _patientService.GetPatientsAsync();
             var file = await _exportFileCSV.WriteDataAsync(patients.ToList());
             return file;
         }
 
-        public async Task<byte[]?> Handle(ExportPatientsToXLSXQuery request, CancellationToken cancellationToken)
+        public async Task<byte[]> Handle(ExportPatientsToXLSXQuery request, CancellationToken cancellationToken)
         {
             var patients = await _patientService.GetPatientsAsync();
-            var file = await _exportFileXLSX.WriteDataAsync(patients.ToList());
+            var file = await _exportFileXLSX.WriteDataPatientsAsync(patients.ToList());
+            return file;
+        }
+
+        public async Task<byte[]> Handle(ExportAttendancesToXLSXQuery request, CancellationToken cancellationToken)
+        {
+            var attendances = await _patientService.GetAttendancesAsync(request.PatientId);
+            var file = await _exportFileXLSX.WriteDataAttendancesAsync(attendances.ToList());
             return file;
         }
     }

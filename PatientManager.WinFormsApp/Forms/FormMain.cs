@@ -16,7 +16,7 @@ namespace PatientManager.WinFormsApp.Forms
         private readonly IPageSizeService _pageSize;
         private readonly PatientController _patientController;
         private FilterInput _filterInput;
-        private string _actualText;
+        private string? _actualText;
 
         public FormMain(IServiceProvider serviceProvider,
                         IPatientService patientService,

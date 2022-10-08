@@ -16,4 +16,8 @@
     <ProjectReference Include="..\PatientManager.Domain\PatientManager.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Commands\Patient\Exports\" />
+  </ItemGroup>
+
 </Project>

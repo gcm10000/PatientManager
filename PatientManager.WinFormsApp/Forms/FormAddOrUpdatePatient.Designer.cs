@@ -252,6 +252,7 @@
             this.Name = "FormAddOrUpdatePatient";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Cadastro de Paciente";
+            this.Load += new System.EventHandler(this.FormAddOrUpdatePatient_Load);
             this._panelMain.ResumeLayout(false);
             this._panelMain.PerformLayout();
             this.panelLeft.ResumeLayout(false);

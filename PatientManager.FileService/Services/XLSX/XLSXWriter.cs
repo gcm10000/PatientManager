@@ -15,16 +15,26 @@ namespace PatientManager.FileService.Services.XLSX
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         }
 
+        public Task<byte[]> WriteDataPatientsAsync(IList<Patient> models)
+        {
+            var exportModels = GetExportModels(models).ToList();
+            return WriteDataAsync(exportModels);
+        }
+
+        public Task<byte[]> WriteDataAttendancesAsync(IList<Attendance> models)
+        {
+            var exportModels = GetExportModels(models).ToList();
+            return WriteDataAsync(exportModels);
+        }
+
         public async Task<byte[]> WriteDataAsync<T>(IList<T> models)
         {
             if (!models.Any())
                 throw new ListEmptyException("Não há registros a serem exportados.");
 
-            var exportModels = GetExportModels(models).ToList();
-
             using var p = new ExcelPackage();
             var ws = p.Workbook.Worksheets.Add(typeof(T).Name);
-            var headers = GetHeaders(GetListType(exportModels), out List<int> columnPositionNotIgnoreExports);
+            var headers = GetHeaders(typeof(T), out List<int> columnPositionNotIgnoreExports);
             for (int headerIndex = 0; headerIndex < headers.Count; headerIndex++)
             {
                 ws.Cells[1, headerIndex + 1].Value = headers[headerIndex];
@@ -35,18 +45,18 @@ namespace PatientManager.FileService.Services.XLSX
                 ws.Cells[1, headerIndex + 1].Style.Font.Bold = true;
             }
 
-            for (int rowIndex = 0; rowIndex < exportModels.Count; rowIndex++)
+            for (int rowIndex = 0; rowIndex < models.Count; rowIndex++)
             {
-                var properties = exportModels[rowIndex].GetType().GetProperties();
+                var properties = models[rowIndex].GetType().GetProperties();
                 foreach (var i in columnPositionNotIgnoreExports)
                 {
                     ws.Cells[rowIndex + 2, columnPositionNotIgnoreExports.IndexOf(i) + 1].Value = 
-                        properties[i].GetValue(exportModels[rowIndex], null);
+                        properties[i].GetValue(models[rowIndex], null);
                 }
             }
 
             ws.Cells.AutoFitColumns();
-            MemoryStream memoryStream = new MemoryStream();
+            var memoryStream = new MemoryStream();
             await p.SaveAsAsync(memoryStream);
             return memoryStream.ToArray();
         }
@@ -56,26 +66,25 @@ namespace PatientManager.FileService.Services.XLSX
             return typeof(T);
         }
 
-        private static object GetExportModel<T>(T model)
+        private static PatientExportModel GetExportModel(Patient model)
         {
-            if (model is Patient)
-            {
-                var patient = model as Patient;
-                var patientExportModel = new PatientExportModel(patient);
-                return patientExportModel;
-            }
-
-            if (model is Attendance)
-            {
-                var attendance = model as Attendance;
-                var patientExportModel = new AttendanceExportModel(attendance);
-                return patientExportModel;
-            }
-
-            throw new ArgumentException("Exportação não configurada.", nameof(model));
+            var patientExportModel = new PatientExportModel(model);
+            return patientExportModel;
         }
 
-        private static IEnumerable<object> GetExportModels<T>(IList<T> models)
+        private static AttendanceExportModel GetExportModel(Attendance model)
+        {
+            var patientExportModel = new AttendanceExportModel(model as Attendance);
+            return patientExportModel;
+        }
+
+        private static IEnumerable<PatientExportModel> GetExportModels(IList<Patient> models)
+        {
+            foreach (var model in models)
+                yield return GetExportModel(model);
+        }
+
+        private static IEnumerable<AttendanceExportModel> GetExportModels(IList<Attendance> models)
         {
             foreach (var model in models)
                 yield return GetExportModel(model);
